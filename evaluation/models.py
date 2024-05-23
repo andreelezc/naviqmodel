@@ -449,9 +449,9 @@ class UserResponse(models.Model):
     selected_options = models.ManyToManyField(AnswerOption, related_name="responses")
 
     def __str__(self):
-        selected_descriptions = [option.description for option in self.selected_options.all()]
+        selected_descriptions = [f"{option.description} (Value: {option.value})" for option in self.selected_options.all()]
         descriptions_str = ", ".join(selected_descriptions)
-        return f"Response from {self.user.username} for {self.application.name}: {descriptions_str}"
+        return f"{self.application.name}: {descriptions_str}"
 
     class Meta:
         unique_together = ('user', 'application', 'evaluation')

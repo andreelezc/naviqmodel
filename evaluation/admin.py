@@ -125,7 +125,7 @@ class QualityProfileAdmin(nested.NestedModelAdmin):
 
 @admin.register(UserResponse)
 class UserResponseAdmin(nested.NestedModelAdmin):
-    list_display = ['id', 'user', 'application', 'evaluation']
+    list_display = ['id', 'user', 'evaluation', '__str__']
     filter_horizontal = ['selected_options']
 
 
