@@ -103,18 +103,21 @@ class QualityProfileCriterionInline(nested.NestedTabularInline):
 
 @admin.register(Application)
 class ApplicationAdmin(nested.NestedModelAdmin):
-    list_display = ['id', 'name', 'response_type', 'help_text', 'help_image']
+    list_display = ['id', 'name', 'description', 'response_type', 'help_text', 'help_image']
+    list_editable = ['name', 'description', 'response_type', 'help_text', 'help_image']
     inlines = [AnswerOptionInline]
 
 
 @admin.register(Property)
 class PropertyAdmin(nested.NestedModelAdmin):
     list_display = ['id', 'name', 'description']
+    list_editable = ['name', 'description']
 
 
 @admin.register(Criterion)
 class CriterionAdmin(nested.NestedModelAdmin):
     list_display = ['id', 'name', 'description']
+    list_editable = ['name', 'description']
 
 
 @admin.register(QualityProfile)
