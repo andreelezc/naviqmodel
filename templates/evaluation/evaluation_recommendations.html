@@ -1,0 +1,64 @@
+{% block extra_styles %}
+<style>
+    .rounded-circle{
+    width: 70px;
+    height: 70px;
+    background-color: #14213d;
+    }
+
+    .rec-title{
+        font-weight: bold;
+        padding-left: 0;
+    }
+
+    .rec-img {
+        max-width: 50%; /* Maximum width of the image */
+        max-height: 300px; /* Maximum height of the image */
+        width: auto; /* Width adjusts to maintain aspect ratio */
+        height: auto; /* Height adjusts to maintain aspect ratio */
+        object-fit: contain;
+        display: block; /* Display as block */
+        margin: 0 auto; /* Auto margin for horizontal centering */
+    }
+
+    .text-highlight{
+        color: #FCA311;
+    }
+
+    .recommendations{
+        padding-left: 0;
+    }
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+<div class="bg-white">
+    <div class="container my-5">
+        <div class="row mt-5" id="recommendations-only-container">
+            {% for recommendation in recommendations %}
+            <div class="col-12 mb-5">
+                <div class="d-flex flex-row align-items-start">
+                    <div class="d-flex flex-column align-items-center justify-content-center me-3">
+                        <div class="d-flex align-items-center justify-content-center rounded-circle text-white border border-4 border-white text-xl font-semibold">
+                            {{ forloop.counter }}
+                        </div>
+                        <span class="text-secondary">STEP</span>
+                    </div>
+                    <div class="bg-light p-3 w-100">
+                        <h4 class="h5">{{ recommendation.name }}</h4>
+                        <p class="text-secondary">
+                            {{ recommendation.help_text | safe }}
+                        </p>
+                        {% if recommendation.help_img %}
+                        <img src="{{ recommendation.help_img }}" alt="Help Image for {{ recommendation.name }}" class="img-fluid rec-img">
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

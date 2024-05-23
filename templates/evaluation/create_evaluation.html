@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block extra_styles %}
+    <style>
+    .btn-start{
+        padding-bottom: 50px;
+        padding-top: 50px;
+    }
+
+    .whole-form-group{
+        padding-bottom: 3rem;
+    }
+
+    .instructions{
+        padding-top: 20px;
+        padding-bottom: 20px;
+    }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-6 offset-md-3 whole-form-group">
+            <h2 class="text-center">Start Evaluation</h2>
+            <p class="text-start text-wrap instructions">
+                To start your evaluation, enter the URL of the visualization and select the quality profile that best suits your needs. Additionally, set the Minimum Viable Score (MVS) to define the lowest acceptable quality threshold for your evaluation. Click 'Start' to proceed.
+            </p>
+            <form method="post" class="mt-3">
+                {% csrf_token %}
+                <div class="form-floating mb-3">
+                    {{ form.file_url|add_class:"form-control" }}
+                    <label for="{{ form.file_url.id_for_label }}">{{ form.file_url.label }}</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <select name="quality_profile" id="quality_profile_id" class="form-select">
+                        <option value="">------</option>
+                        {% for profile in form.fields.quality_profile.queryset %}
+                            <option value="{{ profile.id }}" data-description="{{ profile.description }}">{{ profile }}</option>
+                        {% endfor %}
+                    </select>
+                    <label for="quality_profile_id">{{ form.quality_profile.label }}</label>
+{#                    <small class="form-text text-muted">#}
+{#                        Can't find the profile you need? <a class="link-underline-primary" href="{% url 'add_profile' %}" >Create a new quality profile here</a>.#}
+{#                    </small>#}
+                    <div id="qualityDescription" class="mt-2"></div>
+                </div>
+                <div class="form-floating mb-3">
+                    {{ form.minimum_viable_score|add_class:"form-control" }}
+                    <label for="{{ form.minimum_viable_score.id_for_label }}">Minimum Viable Score</label>
+                    <small class="form-text text-muted">
+                        {{ form.minimum_viable_score.help_text}}.
+                    </small>
+                </div>
+                <div class="d-flex justify-content-center btn-start">
+                    <button type="submit" id="startButton" class="btn btn-custom" disabled>Start</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+   <script>
+        const qualityProfileSelect = document.querySelector('select[name="quality_profile"]');
+        const startButton = document.getElementById('startButton');
+        const descriptionDiv = document.getElementById('qualityDescription');
+
+        function checkFields() {
+            if (document.querySelector('input[name="file_url"]').value && qualityProfileSelect.value) {
+                startButton.removeAttribute('disabled');
+            } else {
+                startButton.setAttribute('disabled', 'disabled');
+            }
+        }
+
+        function displayDescription() {
+            const selectedOption = qualityProfileSelect.options[qualityProfileSelect.selectedIndex];
+            const description = selectedOption.getAttribute('data-description');
+            descriptionDiv.textContent = description ? description : '';
+        }
+
+        // Deshabilitar el botón "Iniciar" inicialmente
+        startButton.setAttribute('disabled', 'disabled');
+
+        // Añadir eventos para detectar cambios en los campos y mostrar descripción
+        document.querySelector('input[name="file_url"]').addEventListener('input', checkFields);
+        qualityProfileSelect.addEventListener('change', function() {
+            checkFields();
+            displayDescription();
+        });
+
+        // Llamar a displayDescription en la carga inicial por si hay un perfil preseleccionado
+        displayDescription();
+
+    </script>
+{% endblock %}

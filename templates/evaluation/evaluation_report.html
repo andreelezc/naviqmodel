@@ -1,0 +1,810 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+
+{% block extra_styles %}
+<style>
+.bordered-section {
+    border: 1px solid #dee2e6; /* Bootstrap's light grey border color */
+    border-radius: 0.30rem; /* Slightly rounded corners */
+    padding: 1rem; /* Add some padding inside the sections */
+    margin-bottom: 1rem; /* Add some margin to the bottom of sections */
+}
+
+.btn-custom {
+    background-color: #FCA311;
+    color: white;
+    display: inline-block;
+    min-width: 120px;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    white-space: nowrap; /* Prevents text from wrapping */
+    overflow: hidden; /* Ensures overflow text is hidden */
+    text-overflow: ellipsis; /* Adds an ellipsis to overflow text */
+}
+.btn-custom:hover {
+    background-color: #f7931e; /* Slightly darker for hover effect */
+    color: white;
+}
+
+.btn-custom-secondary {
+    display: inline-block;
+    min-width: 120px;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    white-space: nowrap; /* Prevents text from wrapping */
+    overflow: hidden; /* Ensures overflow text is hidden */
+    text-overflow: ellipsis; /* Adds an ellipsis to overflow text */
+    border-radius: 3px;
+}
+
+.btn-show-recs{
+    padding-bottom: 50px;
+    padding-top: 50px;
+}
+
+.btn.btn-outline-secondary{
+    border-radius: 3px;
+}
+
+.fixed-width-btn{
+    min-width: 200px;
+}
+
+#report-image {
+    max-width: 70%;  /* Maximum width of the image */
+    max-height: 500px; /* Maximum height of the image */
+    width: auto;       /* Width adjusts to maintain aspect ratio */
+    height: auto;      /* Height adjusts to maintain aspect ratio */
+    object-fit: contain;
+    display: block;    /* Display as block */
+    margin: 0 auto;    /* Auto margin for horizontal centering */
+}
+
+
+i.fa.fa-print{
+    padding-right: 5px;
+}
+
+.results-table{
+    margin-bottom: 50px;
+}
+
+.col-md-6.first-chart{
+    padding-left: 0;
+}
+
+.col-md-6.last-chart{
+    padding-right: 0;
+}
+
+.eval-data{
+    font-size: 15pt;
+    margin-top: 10px;
+}
+
+.print-check {
+    margin-left: 20px;
+}
+
+.material-icons {
+    vertical-align: middle;
+}
+
+.toggle-info {
+    cursor: pointer;
+}
+
+/* Ensure the nested table spans the full width of its container */
+.profile-info .nested-criteria-table {
+    width: 100%; /* Makes nested table span the full width of the parent cell */
+    margin: 0;   /* Removes any default margins */
+}
+
+/* Remove padding from the cells of the nested table to align with the main table headers */
+.profile-info .nested-criteria-table th,
+.profile-info .nested-criteria-table td {
+    padding-left: 0; /* Adjust or remove padding as necessary */
+}
+
+/* DETAILED RESULTS ACCORDION */
+.accordion-button {
+    background-color: #F8F9FA;
+    color: black;
+    {#border-color: #14213D;#}
+}
+
+.accordion-button:not(.collapsed) {
+    background-color: #F8F9FA;
+    color: black;
+}
+
+{#.accordion-button::after {#}
+{#    filter: invert(1); /* This will make the default Bootstrap icons white */#}
+
+
+.accordion-body {
+    background-color: white;
+}
+
+.section-title, .evaluation-score{
+    font-weight: bold;
+}
+
+.total-score, .detailed-results, .recommendations{
+    padding-left: 0;
+}
+
+.accordion-header-criteria .accordion-button {
+    background-color: #A6C9EC;
+}
+.accordion-header-property .accordion-button {
+    background-color: #DAF2D0;
+}
+.accordion-header-application .accordion-button {
+    background-color: #FBE2D5;
+}
+
+/* Remove blue border on focus */
+    .accordion-button:focus {
+        outline: none;
+        box-shadow: none;
+    }
+
+/* CIRCULAR PROGRESS BAR */
+.circular-progress-container {
+    position: relative;
+    width: 100px; /* Tamaño del círculo de progreso */
+    height: 100px;
+    display: flex;
+    justify-content: flex-end; /* Alineación horizontal al final (derecha) */
+    align-items: center; /* Alineación vertical en el centro */
+    margin-left: 300px;
+    margin-bottom: 20px;
+}
+
+.circular-progress {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background-color: #f3f3f3; /* Color de fondo para la parte no llenada del círculo */
+    background-image: conic-gradient(#FCA311 var(--percent), #f3f3f3 var(--percent)); /* Color de llenado y color de fondo */
+
+}
+
+.circular-progress::before {
+    content: '';
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    bottom: 12px;
+    left: 12px;
+    background-color: #fff; /* Color del centro del círculo */
+    border-radius: 50%;
+    z-index: 1;
+}
+
+.circular-progress-label {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+
+
+/* RECOMMENDATIONS SECTION */
+    .rounded-circle{
+    width: 70px;
+    height: 70px;
+    background-color: #14213d;
+    }
+
+    .rec-title{
+        font-weight: bold;
+        padding-left: 0;
+    }
+
+    .rec-img {
+        max-width: 50%; /* Maximum width of the image */
+        max-height: 300px; /* Maximum height of the image */
+        width: auto; /* Width adjusts to maintain aspect ratio */
+        height: auto; /* Height adjusts to maintain aspect ratio */
+        object-fit: contain;
+        display: block; /* Display as block */
+        margin: 0 auto; /* Auto margin for horizontal centering */
+    }
+
+    .text-highlight{
+        color: #FCA311;
+    }
+
+    .recommendations{
+        padding-left: 0;
+    }
+
+    .recommendations-header{
+        margin-bottom: 2rem;
+    }
+
+    .eval-actions-btn-group{
+        margin-bottom: 2rem;
+    }
+
+    #loading-spinner {
+        margin-top: 1.5rem;
+    }
+
+
+
+
+
+
+
+@media screen {
+    /* Screen-only styles go here */
+
+    .no-print, .no-print * {
+        display: none !important;
+    }
+}
+
+@media print {
+    /* Styles applied when printing the page */
+    body {
+        color: black;
+        background: white;
+    }
+
+    /* Hide all sections initially */
+    .print-section {
+        display: none;
+    }
+
+    /* Show only sections marked as printable */
+    .print-section.printable {
+        display: block;
+    }
+
+    /* Hide elements that should not be printed */
+    .no-print, .navbar, .footer, .sidebar, .btn, .modal, .alert.alert-dismissible {
+        display: none !important;
+    }
+
+    .first-chart, .last-chart {
+        width: 50%; /* or another value that fits your layout */
+        float: left; /* This can help keep elements side by side */
+    }
+
+}
+
+</style>
+{% endblock %}
+
+{% block title %}
+    Evaluation Report
+{% endblock title %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row mb-4">
+        <div class="col text-center">
+            <h1 class="display-4 section-title">Evaluation Report</h1>
+        </div>
+    </div>
+    <div class="row mb-12">
+        <div class="col mb-6 text-start">
+            <p class="eval-data"><b>Title:</b> {{ evaluation.title }}</p>
+        </div>
+        <div class="col mb-6 text-end">
+            <p class="eval-data"><b>Date:</b> {{ evaluation.date }}</p>
+        </div>
+    </div>
+    <div class="row mb-12">
+        <div class="col mb-4 text-start">
+            <p class="eval-data"><b>Quality Profile:</b> {{ evaluation.quality_profile.name }}
+                <i class="material-icons toggle-info" aria-hidden="true" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-title="Show profile info">info_outline</i>
+            </p>
+        </div>
+    </div>
+    
+    <!-- Hidden section for the profile info -->
+    <div class="row mb-12 profile-info print-section" style="display: none;">
+        <div class="col mb-4">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Profile Name</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{{ evaluation.quality_profile.name }}</td>
+                        <td>
+                            {{ evaluation.quality_profile.description }}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+  <!-- Image Placeholder Section -->
+    <div class="row mb-4">
+        <div class="col text-center bordered-section">
+            <img src="{{ evaluation.file }}" class="img-fluid" id="report-image" alt="Visualization URL">
+        </div>
+    </div>
+
+    <div class="row align-items-center ">
+        <div class="col-md-8 total-score">
+            <h2 class="display-6 section-title">Total Quality Score</h2>
+        </div>
+        <div class="col-md-4">
+{#            <h2 class="text-end display-6 evaluation-score">{{ evaluation.score|floatformat:2 }}</h2>#}
+                <div class="circular-progress-container text-center">
+                    <div class="circular-progress" style="--percent:{{ evaluation.score|multiply:360|floatformat:0 }}deg;"></div>
+                    <div class="circular-progress-label">{{ evaluation.score|floatformat:2 }}</div>
+                </div>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="row print-section" id="charts-section">
+        <div class="col-md-6 py-2 first-chart">
+            <div class="bordered-section">
+                <h3>Breakdown by Criteria</h3>
+                <div id="criteria-chart"></div>
+            </div>
+        </div>
+        <div class="col-md-6 py-2 last-chart">
+            <div class="bordered-section">
+                <h3>Top Scoring Properties</h3>
+                <div id="properties-chart"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12 detailed-results print-section">
+            <h3 class="display-6 section-title">Detailed Results</h3>
+
+    <!-- Accordion for Detailed Results -->
+    <div class="accordion" id="accordionDetailedResults">
+
+        <!-- Accordion Item for Criteria -->
+        {% for criterion_name, criterion_info in report_data.criteria_scores.items %}
+            <div class="accordion-item">
+                <h2 class="accordion-header accordion-header-criteria" id="headingCriterion{{ forloop.counter }}">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCriterion{{ forloop.counter }}" aria-expanded="true" aria-controls="collapseCriterion{{ forloop.counter }}">
+                        <b>{{ criterion_name }}</b>
+                    </button>
+                </h2>
+                <div id="collapseCriterion{{ forloop.counter }}" class="accordion-collapse collapse show" aria-labelledby="headingCriterion{{ forloop.counter }}" data-bs-parent="#accordionDetailedResults">
+                    <div class="accordion-body">
+                        <table class="table results-table">
+                            <thead>
+                                <tr>
+                                    <th>Description</th>
+                                    <th>Weight</th>
+                                    <th>Score</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>{{ criterion_info.description | safe }}</td>
+                                    <td>{{ criterion_info.weight }}</td>
+                                    <td>{{ criterion_info.score|floatformat:2 }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <!-- Nested Accordion for Properties -->
+                        <div class="accordion" id="accordionProperties{{ forloop.counter }}">
+                            <div class="accordion-item">
+                                <h2 class="accordion-header accordion-header-property" id="headingProperties{{ forloop.counter }}">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseProperties{{ forloop.counter }}" aria-expanded="false" aria-controls="collapseProperties{{ forloop.counter }}">
+                                        <b>Properties</b>
+                                    </button>
+                                </h2>
+                                <div id="collapseProperties{{ forloop.counter }}" class="accordion-collapse collapse" aria-labelledby="headingProperties{{ forloop.counter }}" data-bs-parent="#accordionProperties{{ forloop.counter }}">
+                                    <div class="accordion-body">
+                                        <table class="table results-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Property</th>
+                                                    <th>Description</th>
+                                                    <th>Weight</th>
+                                                    <th>Score</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for property_name, property_info in criterion_info.details.items %}
+                                                    <tr>
+                                                        <td>{{ property_name }}</td>
+                                                        <td>{{ property_info.description | safe }}</td>
+                                                        <td>{{ property_info.weight|floatformat:2 }}</td>
+                                                        <td>{{ property_info.score|floatformat:2 }}</td>
+                                                    </tr>
+                                                    <!-- Nested Accordion for Applications beneath each Property -->
+                                                    <tr>
+                                                        <td colspan="4">
+                                                            <div class="accordion" id="accordionApplications{{ forloop.counter }}">
+                                                                <div class="accordion-item">
+                                                                    <h2 class="accordion-header accordion-header-application" id="headingApplications{{ forloop.parentloop.counter }}{{ forloop.counter }}">
+                                                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseApplications{{ forloop.parentloop.counter }}{{ forloop.counter }}" aria-expanded="false" aria-controls="collapseApplications{{ forloop.parentloop.counter }}{{ forloop.counter }}">
+                                                                            <b>Applications</b>
+                                                                        </button>
+                                                                    </h2>
+                                                                    <div id="collapseApplications{{ forloop.parentloop.counter }}{{ forloop.counter }}" class="accordion-collapse collapse" aria-labelledby="headingApplications{{ forloop.parentloop.counter }}{{ forloop.counter }}" data-bs-parent="#accordionApplications{{ forloop.counter }}">
+                                                                        <div class="accordion-body">
+                                                                            <table class="table results-table">
+                                                                                <thead>
+                                                                                    <tr>
+                                                                                        <th>Application</th>
+                                                                                        <th>Description</th>
+                                                                                        <th>User Response</th>
+                                                                                        <th>Weight</th>
+                                                                                        <th>Score</th>
+                                                                                        <th>
+                                                                                            App Delta
+                                                                                            <i class="material-icons toggle-info" aria-hidden="true" data-bs-toggle="popover" data-bs-placement="right" data-bs-title="What does this mean?" data-bs-content="The Delta value indicates the potential for improving your performance in a given application, based on the application's score and its maximum contribution to the overall quality score." data-bs-trigger="hover">info_outline</i>
+                                                                                        </th>
+                                                                                    </tr>
+                                                                                </thead>
+                                                                                <tbody>
+                                                                                    {% for application_name, application_info in property_info.details.items %}
+                                                                                        <tr>
+                                                                                            <td>{{ application_name }}</td>
+                                                                                            <td>{{ application_info.description | safe }}</td>
+                                                                                            <td>{{ application_info.user_response }}</td>
+                                                                                            <td>
+                                                                                                {% if application_info.weight == 'N/A' %}
+                                                                                                    -
+                                                                                                {% else %}
+                                                                                                    {{ application_info.weight|floatformat:2 }}
+                                                                                                {% endif %}
+                                                                                            </td>
+                                                                                            <td>
+                                                                                                {% if application_info.score == 'N/A' %}
+                                                                                                    -
+                                                                                                {% else %}
+                                                                                                    {{ application_info.score|floatformat:2 }}
+                                                                                                {% endif %}
+                                                                                            </td>
+                                                                                            <td>
+                                                                                                {% with delta=report_data.applications_deltas|get_item:application_name %}
+                                                                                                    {{ delta|floatformat:2 }}
+                                                                                                {% endwith %}
+                                                                                            </td>
+
+                                                                                        </tr>
+                                                                                    {% endfor %}
+                                                                                </tbody>
+                                                                            </table>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- End of Nested Accordion for Properties -->
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+        <!-- End of Accordion Item for Criteria -->
+
+    </div>
+    <!-- End of Accordion for Detailed Results -->
+
+
+
+        </div>
+    </div>
+
+
+<!-- Toggle Recommendations -->
+<div class="row">
+    <div class="col-md-12 text-center">
+        <div class="btn-show-recs">
+            {% if report_data.recommendations %}
+                <a href="#" class="btn btn-custom" id="toggle-recommendations">
+                    <i class="material-icons" id="toggle-icon">keyboard_double_arrow_down</i>
+                    <span id="toggle-text">Show Recommendations</span>
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Recommendations Container -->
+<div class="row">
+    <div class="row recommendations-header" style="display:none;">
+        <form id="mvs-form" method="post" action="{% url 'update_mvs' report_data.evaluation_id %}">
+            {% csrf_token %}
+            <div class="col-md-12 recommendations">
+                <h3 class="display-6 rec-title">
+                    Road to your <span class="text-highlight">Minimum Viable Score</span>
+                </h3>
+                <label class="lead">Your current minimum viable score: </label>
+                <div class="row">
+                    <div class="col-md-6">
+                        {{ form.minimum_viable_score }} <!-- Campo de entrada del formulario -->
+                    </div>
+                    <div class="col-md-6">
+                        <button type="submit" class="btn btn-secondary">Recalculate</button>
+                    </div>
+                </div>
+                <div id="loading-spinner" style="display:none;" class="text-center">
+                    <div class="spinner-border text-secondary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div id="recommendations-container" class="recommendations print-section" style="display:none;">
+        {% include 'evaluation/evaluation_recommendations.html' with recommendations=report_data.recommendations %}
+    </div>
+</div>
+</div>
+
+<!-- Button group section -->
+    <div class="col-md-12 text-center">
+        <div class="btn-group btn-group-lg eval-actions-btn-group" role="group" aria-label="Evaluation actions">
+            <!-- If the user is coming from the list of evaluations, show 'Back to List' button in the button group -->
+            <a href="{% url 'list_evaluations' %}" class="btn btn-outline-secondary fixed-width-btn">
+                <i class="material-icons" aria-hidden="true">list</i>
+                View Evaluations
+            </a>
+            <!-- If the user has just completed an evaluation, show 'New Evaluation' button in the button group -->
+            <a href="{% url 'create_evaluation' %}" class="btn btn-outline-secondary fixed-width-btn">
+                <i class="material-icons" aria-hidden="true">add</i>
+                New Evaluation
+            </a>
+
+            <!-- Button for downloading the report in the button group -->
+            <button type="button" class="btn btn-outline-secondary fixed-width-btn" data-bs-toggle="modal" data-bs-target="#printModal" aria-label="Print report">
+                <i class="fa fa-download" aria-hidden="true"></i> Download Report
+            </button>
+
+            <!-- Button to finish and return to home in the button group -->
+            <a href="{% url 'home' %}" class="btn btn-outline-secondary fixed-width-btn">
+                <i class="material-icons" aria-hidden="true">check</i>
+                Finish
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Select Sections to Print/download Modal -->
+<div class="modal fade" id="printModal" tabindex="-1" role="dialog" aria-labelledby="printModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="printModalLabel">Select sections to download</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Instructional text -->
+        <p class="text-muted">
+            Check the sections of the report you want to include in your printout. When you're ready, click 'Download' to proceed.
+        </p>
+        <!-- Select All checkbox -->
+        <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="" id="selectAll" checked>
+        <label class="form-check-label" for="selectAll">
+            Select All
+        </label>
+        </div>
+        <!-- Add a checkbox for each section -->
+        <div class="form-check print-check">
+          <input class="form-check-input" type="checkbox" value="" id="printProfileInfo" checked>
+          <label class="form-check-label" for="printProfileInfo">
+            Quality Profile Info
+          </label>
+        </div>
+        <div class="form-check print-check">
+          <input class="form-check-input" type="checkbox" value="" id="printCharts" checked>
+          <label class="form-check-label" for="printCharts">
+            Charts
+          </label>
+        </div>
+        <div class="form-check print-check">
+          <input class="form-check-input" type="checkbox" value="" id="printDetailedResults" checked>
+          <label class="form-check-label" for="printDetailedResults">
+            Detailed Results
+          </label>
+        </div>
+        <div class="form-check print-check">
+          <input class="form-check-input" type="checkbox" value="" id="printRecommendations" checked>
+          <label class="form-check-label" for="printRecommendations">
+            Recommendations
+          </label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-custom" onclick="printSelectedSections()">Download Selected Sections</button>
+        <button type="button" class="btn btn-secondary btn-custom-secondary" data-bs-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<!-- Include Plotly.js -->
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+<script type="text/javascript">
+    // Render the Plotly charts
+    var criteriaChart = {{ report_data.criteria_chart|safe }};
+    var propertiesChart = {{ report_data.properties_chart|safe }};
+
+    Plotly.newPlot('criteria-chart', criteriaChart.data, criteriaChart.layout);
+    Plotly.newPlot('properties-chart', propertiesChart.data, propertiesChart.layout);
+
+
+    // Initialize Bootstrap tooltip
+     $(document).ready(function(){
+        $('[data-bs-toggle="tooltip"]').tooltip();
+        $('[data-bs-toggle="popover"]').popover();
+    });
+
+    // toggle profile info
+     $(document).ready(function(){
+        // Initialize Bootstrap tooltip
+        $('[data-bs-toggle="tooltip"]').tooltip();
+
+        // Toggle the visibility of the profile info on icon click
+        $('.toggle-info').click(function() {
+            $('.profile-info').slideToggle(); // Use slideToggle for a smooth effect
+        });
+    });
+
+
+// Display Recommendations
+document.addEventListener('DOMContentLoaded', function () {
+    var toggleButton = document.getElementById('toggle-recommendations');
+    var recommendationsContainer = $('#recommendations-container'); // Use jQuery selector
+    var recommendationsHeader = $('.recommendations-header'); // Selector for the header
+    var toggleText = document.getElementById('toggle-text');
+    var toggleIcon = document.getElementById('toggle-icon');
+
+    toggleButton.addEventListener('click', function (event) {
+        event.preventDefault();
+
+        // Use slideToggle for both the header and container
+        recommendationsHeader.slideToggle(400); // Toggle the header
+        recommendationsContainer.slideToggle(400, function() { // Toggle the container
+            // This function is called after the toggle is complete
+            if (recommendationsContainer.is(":visible")) {
+                toggleText.textContent = 'Hide Recommendations'; // Change text
+                toggleIcon.textContent = 'keyboard_double_arrow_up'; // Change icon
+            } else {
+                toggleText.textContent = 'Show Recommendations'; // Revert text
+                toggleIcon.textContent = 'keyboard_double_arrow_down'; // Revert icon
+            }
+        });
+    });
+});
+
+
+// Función para actualizar el MVS y obtener nuevas recomendaciones utilizando AJAX
+function actualizarMVS(formData) {
+    // Primero ocultar suavemente la sección de recomendaciones actual
+    $('#recommendations-container').slideUp(function() {
+        // Después de que la sección se haya ocultado, mostrar el spinner
+        $('#loading-spinner').show();
+    });
+
+    $.ajax({
+        url: '{% url 'update_mvs' evaluation.id %}',
+        method: 'POST',
+        data: formData,
+        success: function(response) {
+            if (response.success) {
+                // Retrasar la actualización de las recomendaciones
+                setTimeout(function() {
+                    actualizarSeccionRecomendaciones(function() {
+                        $('#loading-spinner').hide();  // Ocultar el spinner
+                        // Mostrar la nueva sección de recomendaciones
+                        $('#recommendations-container').slideDown();
+                    });
+                }, 1000); // Delay de 1 segundo
+            } else {
+                alert('An error occurred while updating MVS.');
+                $('#loading-spinner').hide();  // Ocultar el spinner
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error(error);
+            alert('An error occurred while updating MVS.');
+            $('#loading-spinner').hide();  // Ocultar el spinner
+        }
+    });
+}
+
+// Función para actualizar la sección de recomendaciones utilizando AJAX
+function actualizarSeccionRecomendaciones(callback) {
+    setTimeout(function() {
+        $('#recommendations-container').load('{% url 'update_recommendations' evaluation_id=report_data.evaluation_id %}', function() {
+            if (callback) {
+                callback();
+            }
+            $(this).slideDown(); // Mostrar suavemente la sección actualizada
+        });
+    }, 1000); // Delay de 1 segundo
+}
+
+
+// Manejar el evento de envío del formulario de actualización del MVS
+$('#mvs-form').submit(function(event) {
+    event.preventDefault(); // Evitar que el formulario se envíe normalmente
+    var formData = $(this).serialize(); // Obtener los datos del formulario
+    actualizarMVS(formData);  // Llamar a la función para actualizar el MVS con los datos del formulario
+});
+
+
+// SELECT PRINTABLE-DOWNLOAD SECTIONS
+    // Event listener for 'Select All' checkbox
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('selectAll').addEventListener('change', function() {
+            var checkboxes = document.querySelectorAll('.modal-body .form-check input[type="checkbox"]');
+            for (var i = 0; i < checkboxes.length; i++) {
+                if (checkboxes[i].id !== 'selectAll') {
+                    checkboxes[i].checked = this.checked;
+                }
+            }
+        });
+    });
+
+    // Select printable options
+    function printSelectedSections() {
+    // Clear previous selections
+    document.querySelectorAll('.print-section').forEach(function(section) {
+        section.classList.remove('printable');
+    });
+
+    // Check if the profile info should be printed
+    if (document.getElementById('printProfileInfo').checked) {
+        document.querySelector('.profile-info').classList.add('printable');
+    }
+
+    // Check if the charts section should be printed
+    if (document.getElementById('printCharts').checked) {
+        document.getElementById('charts-section').classList.add('printable');
+    }
+
+    // Check if the detailed results should be printed
+    if (document.getElementById('printDetailedResults').checked) {
+        document.querySelector('.detailed-results').classList.add('printable');
+    }
+
+    // Check if the recommendations should be printed
+       if (document.getElementById('printRecommendations').checked) {
+        var recommendationsSection = document.querySelector('.recommendations');
+        recommendationsSection.classList.add('printable');
+        recommendationsSection.style.display = 'block'; // Ensure it's visible
+    }
+
+
+    // Now print the page
+    window.print();
+
+    // Close the modal after printing
+    $('#printModal').modal('hide');
+    }
+</script>
+{% endblock %}

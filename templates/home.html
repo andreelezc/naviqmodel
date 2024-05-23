@@ -1,0 +1,843 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block extra_styles %}
+<style>
+
+.hero {
+    padding: 3rem 0;
+}
+.hero-image {
+    max-width: 540px;
+}
+
+.dropdown-item.active, .dropdown-item:active{
+    background-color: #FCA311;
+}
+
+
+/* Elements of the model */
+.elements-title{
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+}
+
+/* steps */
+
+ .steps-indicator {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    padding: 2rem 0;
+}
+.step {
+    text-align: center;
+    position: relative;
+    flex: 1;
+    z-index: 1; /* Ensure the step content appears above the line */
+}
+.step .circle {
+    background-color: #f8f9fa;
+    border-radius: 50%;
+    width: 72px;
+    height: 72px;
+    line-height: 72px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    font-size: 24px;
+    color: #6c757d;
+    position: relative; /* For the pseudo-element positioning */
+    z-index: 2; /* Ensure circles appear above the lines */
+}
+.step .label {
+    margin-top: 1rem;
+}
+/* Line before each step except the first */
+.step:not(:first-child)::before {
+    content: '';
+    position: absolute;
+    top: 36px; /* Half the height of the circle */
+    left: 0;
+    transform: translateX(-50%);
+    height: 2px;
+    width: calc(50% - 36px); /* Half the width minus half the circle's diameter */
+    background-color: #ddd;
+}
+/* Line after each step except the last */
+.step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 36px; /* Half the height of the circle */
+    right: 0;
+    transform: translateX(50%);
+    height: 2px;
+    width: calc(50% - 36px); /* Half the width minus half the circle's diameter */
+    background-color: #ddd;
+}
+
+.step-set{
+    margin-bottom: 2rem;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+}
+
+  /* Sección Anatomía */
+  .narrow-card {
+    {#width: 80%; /* You can adjust this value */#}
+    margin: 0 auto; /* This centers the card in the column */
+    background-color: #f8f9fa; /* This is a light grey color */
+    }
+
+  /* FAQ */
+    .faq-section .accordion-button {
+        background-color: #14213D;
+        color: white;
+        border-color: #14213D;
+    }
+    {##}
+    .faq-section .accordion-button:not(.collapsed) {
+        color: white;
+        background-color: #14213D;
+    }
+
+    .faq-section .accordion-button::after {
+        filter: invert(1); /* This will make the default Bootstrap icons white */
+    }
+
+    /* Common style for all full-screen sections */
+    .full-screen-section {
+        min-height: 100vh; /* Sets the minimum height to full viewport height */
+        display: flex;
+        flex-direction: column;
+        justify-content: center; /* Centers content vertically */
+        align-items: center; /* Centers content horizontally */
+    }
+
+    /* Top button */
+    #topBtn {
+    display: none; /* Hidden by default */
+    position: fixed; /* Fixed position */
+    bottom: 20px; /* Place the button at the bottom of the page */
+    right: 30px; /* Place the button 30px from the right */
+    z-index: 99; /* Make sure it does not overlap */
+    border: none; /* No border */
+    outline: none; /* Remove outline */
+    background-color: #0d162a; /* Dark background */
+    color: white; /* Text color */
+    cursor: pointer; /* Add a mouse pointer on hover */
+    padding: 15px; /* Some padding */
+    border-radius: 10px; /* Rounded corners */
+    font-size: 18px; /* Increase font size */
+    transition: bottom 0.3s; /* Smooth transition for moving the button up */
+}
+
+    #topBtn:hover {
+    background-color: #0D162AFF; /* Add a darker background on hover */
+}
+
+
+    /* TREE STYLES */
+    #tree {
+        display: flex;
+        justify-content: center;
+        width: 100%; /* o el ancho que prefieras */
+        margin: 0 auto;
+    }
+
+
+    .node rect {
+            stroke: black;
+            stroke-width: 1px;
+            min-width: 100px;
+            height: 50px;
+        }
+
+    .link {
+        fill: none;
+        stroke: #ccc;
+        stroke-width: 2px;
+    }
+
+    /* Estilos para el modal */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.4);
+    }
+
+    .modal-content {
+        background-color: #fefefe;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 30%;
+    }
+
+</style>
+{% endblock %}
+
+{% block nav-bar-items %}
+    <!-- Conditional display based on authentication status -->
+    {% if user.is_authenticated %}
+        <!-- Dropdown menu for authenticated user -->
+        <div class="dropdown show">
+            <a class="btn btn-custom dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="fa fa-user"></i> {{ user.username }} <span class="separator">|</span><!-- Display the username here -->
+            </a>
+            <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuLink">
+                <a class="dropdown-item" href="{% url 'list_evaluations' %}"><i class="fa fa-list" aria-hidden="true"></i> My Evaluations</a>
+                <a class="dropdown-item" href="{% url 'quality_profile_list' %}"><i class="fa fa-gears"></i> My Quality Profiles</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="{% url 'logout' %}"><i class="fa fa-sign-out" aria-hidden="true"></i>Log out</a>
+            </div>
+        </div>
+    {% else %}
+        <button class="btn btn-custom btn-lg me-2" type="button" onclick="location.href='{% url 'login' %}'">Log in</button>
+        <a href="{% url 'register' %}" class="nav-link">Register</a>
+    {% endif %}
+{% endblock %}
+
+
+{% block content %}
+<!-- Hero Section -->
+<div class="container full-screen-section hero" id="hero-section">
+    <div class="container px-4 py-5" id="custom-cards">
+        <div class="row row-cols-1 row-cols-lg-2 align-items-center g-4 py-5">
+            <div class="col">
+                <h1 class="display-5 fw-bold lh-1 mb-3">NaVi-Q Quality Model</h1>
+                <p class="lead">The NaVi-Q model provides a systematic framework for assessing the quality of narrative visualizations. Our model enables researchers and designers to improve their visualizations based on quality criteria and properties grounded in the literature.</p>
+                <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+                    <!-- Conditional Evaluar Button -->
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'create_evaluation' %}" class="btn btn-custom btn-lg px-4">Evaluate</a>
+                    {% else %}
+                        <a href="{% url 'login' %}?next={% url 'create_evaluation' %}" class="btn btn-custom btn-lg px-4">Evaluate</a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col d-none d-lg-block">
+                <img src="{% static 'hero_img.jpg' %}" alt="Bootstrap Themes" class="img-fluid">
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Separator -->
+ <hr>
+
+<!-- Contenedor para el Árbol D3.js -->
+{#<div class="col text-center full-screen-section section-title">#}
+{#    <h2 class="display-6 fw-bold">Elements of the Model</h2>#}
+{#        <p class="lead">Get to know the components of the quality model. You can expand a node to get more info by pressing shift + click.</p>#}
+{#    <div id="tree"></div>#}
+{#</div>#}
+
+<!-- Model Elements Section -->
+<div class="container full-screen-section">
+    <!-- Title Row -->
+    <div class="row">
+        <div class="col text-center section-title elements-title">
+            <h2 class="display-6 fw-bold">Elements of the Model</h2>
+            <p class="lead">Get to know the components of the quality model. You can expand a node to get more info by pressing shift + click.</p>
+        </div>
+    </div>
+    <!-- Tree View Row -->
+    <div class="row">
+        <div class="col text-center">
+            <div id="tree"></div>
+        </div>
+    </div>
+    <!-- Botón de Reinicio -->
+    <div class="row">
+        <div class="col text-end">
+            <button id="resetButton" class="btn btn-tertiary fw-light" style="display: flex; align-items: center; justify-content: center;">
+                <i class="material-icons">restart_alt</i>
+                Reset Tree
+            </button>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal de nodos-->
+<div id="myModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="modalTitle"></h4>
+          <button type="button" class="btn-close close-info-modal" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+          <p id="modalText"></p>
+      </div>
+    </div>
+</div>
+<!-- Separador -->
+<hr>
+
+<!-- Steps Section -->
+<div class="container full-screen-section steps-indicator" id="steps-section">
+    <div class="container">
+        <!-- Section Title -->
+        <div class="row">
+            <div class="col text-center">
+                <h2 class="display-6 fw-bold">How it works</h2>
+                <p class="lead">Follow these simple steps to assess your visualization</p>
+            </div>
+        </div>
+        <!-- Steps Row -->
+        <div class="row step-set">
+            <!-- Step 1 -->
+            <div class="col-md-3 text-center">
+                <div class="step active">
+                    <div class="circle">01</div>
+                    <div class="label"><b>Upload a file</b></div>
+                    <p>Select and upload your visualization file to begin the evaluation process.</p>
+                </div>
+            </div>
+            <!-- Step 2 -->
+            <div class="col-md-3 text-center">
+                <div class="step">
+                    <div class="circle">02</div>
+                    <div class="label"><b>Select a Quality Profile</b></div>
+                    <p>Choose from the predefined profiles or create a custom one.</p>
+                </div>
+            </div>
+            <!-- Step 3 -->
+            <div class="col-md-3 text-center">
+                <div class="step">
+                    <div class="circle">03</div>
+                    <div class="label"><b>Evaluate</b></div>
+                    <p>Answer a series of questions based on the chosen profile.</p>
+                </div>
+            </div>
+            <!-- Step 4 -->
+            <div class="col-md-3 text-center">
+                <div class="step">
+                    <div class="circle">04</div>
+                    <div class="label"><b>View your results</b></div>
+                    <p>Examine the report to understand the strengths and areas for improvement.</p>
+                </div>
+            </div>
+        </div>
+        <!-- Evaluate Button Row -->
+        <div class="row">
+            <div class="col text-center">
+                <!-- Conditional Evaluate Button -->
+                {% if user.is_authenticated %}
+                    <a href="{% url 'create_evaluation' %}" class="btn btn-custom btn-lg px-4 mt-4">Evaluate</a>
+                {% else %}
+                    <a href="{% url 'login' %}?next={% url 'create_evaluation' %}" class="btn btn-custom btn-lg px-4 mt-4">Evaluate</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Separator -->
+ <hr>
+<!-- Anatomy of a Chart Section -->
+<div class="container full-screen-section" id="anatomia-section">
+    <div class="container my-5">
+        <div class="row">
+            <div class="col text-center section-title">
+                <h2 class="display-6 fw-bold">Anatomy of a Chart</h2>
+                <p class="mb-4 lead">Learn the common terminology regarding charts to enhance your assessment interpretation.</p>
+            </div>
+        </div>
+        <div class="row row-cols-1 row-cols-md-2 g-4">
+            <!-- Axes Card -->
+            <div class="col">
+                <div class="card h-100 narrow-card">
+                    <div class="card-body">
+                        <h5 class="card-title"><span class="material-icons">crop</span> <b>Axes</b></h5>
+                        <p class="card-text">The horizontal and vertical lines that frame the chart area, typically used to measure and categorize data points.</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Labels Card -->
+            <div class="col">
+                <div class="card h-100 narrow-card">
+                    <div class="card-body">
+                        <h5 class="card-title"><span class="material-icons">text_fields</span> <b>Labels</b></h5>
+                        <p class="card-text">Textual descriptions that provide information about the data, such as axis titles, data series names, and individual data points.</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Data Markers Card -->
+            <div class="col">
+                <div class="card h-100 narrow-card">
+                    <div class="card-body">
+                        <h5 class="card-title"><span class="material-icons">workspaces</span> <b>Data Markers</b></h5>
+                        <p class="card-text">Symbols or shapes placed at data point locations to represent the value of the data, such as dots on a line chart or bars in a bar chart.</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Legends Card -->
+            <div class="col">
+                <div class="card h-100 narrow-card">
+                    <div class="card-body">
+                        <h5 class="card-title"><span class="material-icons">format_list_bulleted</span> <b>Legends</b></h5>
+                        <p class="card-text">A key that explains the symbols, colors, or patterns used to differentiate data series or categories within the chart.</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Gridlines Card -->
+            <div class="col">
+                <div class="card h-100 narrow-card">
+                    <div class="card-body">
+                        <h5 class="card-title"><span class="material-icons">grid_3x3</span> <b>Gridlines</b></h5>
+                        <p class="card-text">Light lines that extend across the chart area, usually aligned with major tick marks, to help read values and compare data points.</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Annotations Card -->
+            <div class="col">
+                <div class="card h-100 narrow-card">
+                    <div class="card-body">
+                        <h5 class="card-title"><span class="material-icons">edit</span> <b>Annotations</b></h5>
+                        <p class="card-text">Additional notes or comments added to a chart to explain specific data points or trends, providing context or analysis.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Separator -->
+ <hr>
+<!-- FAQ Section -->
+<div class="container full-screen-section faq-section" id="faq-section">
+    <div class="container my-5 faq-section">
+        <div class="row">
+            <div class="col text-center section-title">
+                <h2 class="display-6 fw-bold">About the Model</h2>
+                <p class="mb-4 lead">Understand the background of our model and learn more about the authors and their research contributions.</p>
+            </div>
+        </div>
+<!-- Accordion -->
+    <div class="accordion" id="accordionPanelsStayOpenExample">
+      <div class="accordion-item">
+        <h2 class="accordion-header w-100" id="panelsStayOpen-headingOne">
+          <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="true" aria-controls="panelsStayOpen-collapseOne">
+            Sources
+          </button>
+        </h2>
+        <div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse show" aria-labelledby="panelsStayOpen-headingOne">
+          <div class="accordion-body">
+              <p class="fs-6 text">The NaVi-Q model is the outcome of a Doctoral Thesis research. Drawing from established models in the field of Software Engineering and Information Visualization, as well as the ISO/IEC 25000 Standards, this model adapts and extends these concepts to meet the specific requirements of narrative visualizations.
+                  <br><br>The criteria and properties were derived from a Systematic Mapping Study and analysis of the relevant literature. This review ensured that the model's framework is robust and consistent with the gaps identified in the field. The detailed findings and methodologies of this systematic mapping study are documented in the publications listed below.</p>
+          </div>
+        </div>
+      </div>
+      <div class="accordion-item">
+        <h2 class="accordion-header w-100" id="panelsStayOpen-headingTwo">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseTwo" aria-expanded="false" aria-controls="panelsStayOpen-collapseTwo">
+            Publications
+          </button>
+        </h2>
+        <div id="panelsStayOpen-collapseTwo" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingTwo">
+            <div class="accordion-body">
+                <p class="fs-6 text">These academic papers are central to the development of our model. Each one offers detailed insights into the methodologies and findings that contributed to its creation.</p>
+                <ul>
+                    <li><a href="https://doi.org/10.3897/jucs.66714" target="_blank" rel="noopener noreferrer" class="fs-6 text">Data-driven Storytelling to Support Decision Making in Crisis Settings: A Case Study</a></li>
+                    <li><a href="https://www.researchsquare.com/article/rs-1735564/v1" target="_blank" rel="noopener noreferrer" class="fs-6 text">Narrative Visualizations Best Practices and Evaluation: A Systematic Mapping Study</a></li>
+                    <li><a href="" target="_blank" rel="noopener noreferrer" class="fs-6 text">NaVi-Q: A Quality Model for Evaluating Narrative Information Visualizations</a></li>
+                    <!-- More list items as needed -->
+                </ul>
+            </div>
+        </div>
+      </div>
+      <div class="accordion-item">
+        <h2 class="accordion-header w-100" id="panelsStayOpen-headingThree">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseThree" aria-expanded="false" aria-controls="panelsStayOpen-collapseThree">
+            The Authors
+          </button>
+        </h2>
+        <div id="panelsStayOpen-collapseThree" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingThree">
+              <div class="accordion-body">
+                <p class="fs-6 text">
+                    <a href="https://orcid.org/0000-0003-1361-2797" target="_blank" rel="noopener noreferrer">
+                        <img src="https://orcid.org/sites/default/files/images/orcid_16x16.png" width="16" height="16" alt="ORCID iD icon"/>
+                    </a>
+                    <strong>Andrea Lezcano Airaldi</strong>
+                    is a Ph.D. candidate at the National University of the Northeast. She began her doctoral studies in 2021, shortly after earning her Bachelor's degree in 2020. Since 2018, Andrea has been an active member of the Software Quality Research Group at the university. Her research is centered on narrative visualization, with a particular focus on the evaluation of visualizations.
+                </p>
+                <br>
+                <p class="fs-6 text">
+                    <a href="https://orcid.org/0000-0003-2096-5638" target="_blank" rel="noopener noreferrer">
+                        <img src="https://orcid.org/sites/default/files/images/orcid_16x16.png" width="16" height="16" alt="ORCID iD icon"/>
+                    </a>
+                    <strong>Dr. Emanuel Irrazábal</strong>
+                    received his Engineering degree in Information Systems from UTN University, Resistencia, Argentina, in 2006. He went on to earn his M.S. degree in Information Systems in 2009 and his Ph.D. in Informatics in 2012, both from Rey Juan Carlos University, Móstoles, Spain. Currently, he serves as an Adjunct Professor of Software Engineering at the National University of the Northeast in Corrientes, Argentina.
+                </p>
+                <br>
+                <p class="fs-6 text">
+                    <a href="https://orcid.org/0000-0002-1765-7872" target="_blank" rel="noopener noreferrer">
+                        <img src="https://orcid.org/sites/default/files/images/orcid_16x16.png" width="16" height="16" alt="ORCID iD icon"/>
+                    </a>
+                    <strong>Dr. Andrés Diaz Pace</strong>
+                    is a Professor at UNICEN University, Argentina, and a research fellow at CONICET. His research focuses on quality-driven architectural design and AI techniques. He has authored publications on design assistance, refactoring, and object-oriented frameworks. He is actively involved in industry technology transfer projects and has served as a lead architect and evaluator. He earned his Ph.D. in Computer Science from UNICEN in 2004.
+                </p>
+            </div>
+
+        </div>
+      </div>
+    </div>
+    </div>
+</div>
+<!-- End of FAQ Section -->
+<button onclick="topFunction()" id="topBtn" title="Go to top">Top</button>
+{% endblock %}
+{% block extra_scripts %}
+<script>
+// Get the button and the footer
+var myBtn = document.getElementById("topBtn");
+var footer = document.getElementById("footer");
+
+// Calculate the position where the button should start moving up
+function getButtonPosition() {
+    var footerRect = footer.getBoundingClientRect();
+    var footerPosition = window.pageYOffset + footerRect.top;
+    var buttonOffset = 1; // Distance from the bottom of the viewport
+
+    return footerPosition - window.innerHeight + buttonOffset;
+}
+
+window.onscroll = function() {
+    var heroSection = document.getElementById("hero-section");
+    var heroSectionBottom = heroSection.offsetTop + heroSection.offsetHeight;
+    var buttonPosition = getButtonPosition();
+
+    if (window.pageYOffset >= heroSectionBottom) {
+        myBtn.style.display = "block"; // Show the button
+    } else {
+        myBtn.style.display = "none"; // Hide the button
+    }
+
+    if (window.pageYOffset >= buttonPosition) {
+        // Move the button up
+        myBtn.style.bottom = (window.pageYOffset - buttonPosition + 20) + "px";
+    } else {
+        // Position the button at its normal position
+        myBtn.style.bottom = "20px";
+    }
+};
+
+function topFunction() {
+    document.body.scrollTop = 0; // For Safari
+    document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE, and Opera
+}
+</script>
+
+<!-- Incluir D3.js -->
+<script src="https://d3js.org/d3.v5.min.js"></script>
+
+<script type="text/javascript">
+    var treeData = {{ tree_data | safe }};
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Variable para asignar identificadores únicos a cada nodo
+    var i = 0;
+
+    // Variables para el árbol
+    var svg, tree, root;
+
+    // Función para colapsar un nodo
+    function collapse(d) {
+        if (d.children) {
+            d._children = d.children;
+            d.children = null;
+        }
+    }
+
+    // Función para expandir completamente un nodo y todos sus descendientes
+    function expandFully(d) {
+        if (d._children) {
+            d.children = d._children;
+            d._children = null;
+            if (d.children) {
+                d.children.forEach(expandFully);
+            }
+        }
+    }
+
+    // Función para expandir o colapsar el siguiente nivel de hijos
+    function toggleChildren(d) {
+        if (d.children) {
+            d._children = d.children;
+            d.children = null;
+        } else if (d._children) {
+            d.children = d._children;
+            d._children = null;
+        }
+    }
+
+    // Función para inicializar y cargar el árbol
+    function initializeTree() {
+        // Si el SVG ya existe, lo eliminamos antes de crear uno nuevo
+        d3.select("#tree svg").remove();
+
+        // Configuración de márgenes y dimensiones
+        var margin = {top: 20, right: 20, bottom: 20, left: 20},
+            width = 1500 - margin.right - margin.left,
+            height = 800 - margin.top - margin.bottom;
+
+        // Creación y configuración del elemento SVG
+        svg = d3.select("#tree").append("svg")
+            .attr("width", width + margin.right + margin.left)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        // Creación de la estructura del árbol con D3
+        tree = d3.tree().size([width, height]);
+        tree.separation(function(a, b) {
+            return (a.parent === b.parent ? 1 : 2);
+        });
+
+        // Definición de la raíz del árbol
+        root = d3.hierarchy(treeData, function(d) { return d.children; });
+        root.x0 = 0;
+        root.y0 = height/2;
+
+        {#// Colapsar todos los nodos excepto el tercero y desplegar solo un hijo de cada nodo de segundo nivel#}
+        {#if (root.children) {#}
+        {#    root.children.forEach(function(child, index) {#}
+        {#        if (index !== 2) {#}
+        {#            collapse(child);#}
+        {#        } else if (child.children && child.children.length > 1) {#}
+        {#            child.children.slice(1).forEach(function(grandChild) {#}
+        {#                collapse(grandChild);#}
+        {#            });#}
+        {#        }#}
+        {#    });#}
+        {#}#}
+
+        // Colapsar todos los nodos excepto el tercero y desplegar solo el nodo del medio de los hijos del tercer nodo de primer nivel
+        if (root.children) {
+            root.children.forEach(function(child, index) {
+                if (index !== 2) { // Colapsamos todos excepto el tercer nodo
+                    collapse(child);
+                } else { // Tratamos al tercer nodo
+                    // Asegurarse de que el nodo tenga hijos
+                    if (child.children && child.children.length > 1) {
+                        // Colapsamos todos los hijos
+                        child.children.forEach(collapse);
+
+                        // Calculamos el índice del hijo del medio
+                        var middleChildIndex = Math.floor(child.children.length / 2);
+                        // Expandimos el nodo hijo del medio
+                        expandFully(child.children[middleChildIndex]);
+                    }
+                }
+            });
+        }
+
+
+        // Llamada inicial para desplegar el árbol
+        update(root);
+    }
+
+    // Función para actualizar el árbol
+        function update(source) {
+            var treeData = tree(root);
+            var nodes = treeData.descendants(),
+                links = treeData.descendants().slice(1);
+
+            // Ajuste de la posición Y basado en la profundidad de cada nodo
+            nodes.forEach(function(d){ d.y = d.depth * 150 });
+
+            // Selección y unión de datos de nodos
+            var node = svg.selectAll('g.node')
+                .data(nodes, function(d) {return d.id || (d.id = ++i); });
+
+            // Creación y posicionamiento de cada nodo
+            var nodeEnter = node.enter().append('g')
+                .attr('class', 'node')
+                .attr("transform", function(d) {
+                    return "translate(" + d.x0 + "," + d.y0 + ")";
+                })
+                .on('click', click);
+
+            // Creación de rectángulos para los nodos
+            nodeEnter.append('rect')
+                .attr('class', 'node')
+                .attr('width', function(d) {
+                    return d.data.name.length * 10;
+                })
+                .attr('height', 20)
+                .attr('x', function(d) {
+                    return -d.data.name.length * 4;
+                })
+                .attr('y', -10)
+                .attr('rx', 10)
+                .attr('ry', 10)
+                .style("fill", function(d) {
+                    return d._children ? "white" : "#fff";
+                    return colorScale[d.depth % colorScale.length];  //asigna un color por nivel
+                });
+
+            // Adición de texto a los nodos
+            nodeEnter.append('text')
+                .style("fill", "black")
+                .attr("font-size", "15px")
+                .attr("dy", "1.2em")
+                .attr("x", 8)
+                .attr("text-anchor", "middle")
+                .text(function(d) { return d.data.name; });
+
+            // Actualización de los nodos existentes
+            var nodeUpdate = nodeEnter.merge(node);
+            nodeUpdate.transition()
+                .duration(500)
+                .attr("transform", function(d) {
+                    return "translate(" + d.x + "," + d.y + ")";
+                });
+
+            // Eliminación de nodos antiguos
+            var nodeExit = node.exit().transition()
+                .duration(500)
+                .attr("transform", function(d) {
+                    return "translate(" + source.x + "," + source.y + ")";
+                })
+                .remove();
+
+            // Selección y unión de datos para los enlaces
+            var link = svg.selectAll('path.link')
+                .data(links, function(d) { return d.id; });
+
+            // Creación de los enlaces
+            var linkEnter = link.enter().insert('path', "g")
+                .attr("class", "link")
+                .attr('d', function(d){
+                    var o = {x: source.x0, y: source.y0};
+                    return diagonal(o, o);
+                });
+
+            // Actualización de enlaces existentes
+            var linkUpdate = linkEnter.merge(link);
+            linkUpdate.transition()
+                .duration(500)
+                .attr('d', function(d){ return diagonal(d, d.parent) });
+
+            // Eliminación de enlaces antiguos
+            var linkExit = link.exit().transition()
+                .duration(500)
+                .attr('d', function(d) {
+                    var o = {x: source.x, y: source.y};
+                    return diagonal(o, o);
+                })
+                .remove();
+
+            // Guardar las posiciones para transiciones
+            nodes.forEach(function(d){
+                d.x0 = d.x;
+                d.y0 = d.y;
+            });
+
+            // Función para crear el camino diagonal de los enlaces
+            function diagonal(s, d) {
+                var path = `
+                    M ${s.x} ${s.y}
+                    C ${s.x} ${(s.y + d.y) / 2},
+                      ${d.x} ${(s.y + d.y) / 2},
+                      ${d.x} ${d.y}
+                `;
+                return path;
+            }
+        }
+
+    // Función click y otras funciones de interacción...
+    function click(d) {
+        if (d3.event.shiftKey) {
+            // Mostrar modal si se presiona la tecla Shift
+            showModal(d);
+            return;
+        }
+
+        // Condición especial para el nodo raíz
+        if (!d.parent) {
+            // Expandir o colapsar solo el siguiente nivel
+            toggleChildren(d);
+            update(d);
+            return;
+        }
+
+        // Colapsar los nodos en el mismo nivel antes de expandir el clickeado
+        if (d.parent && d.parent.children) {
+            d.parent.children.forEach(function(child) {
+                if (child !== d && child.children) {
+                    collapse(child);
+                }
+            });
+        }
+
+        if (d.children) {
+            // Si el nodo tiene hijos visibles, colapsa solo el siguiente nivel
+            d.children.forEach(function(child){
+                collapse(child);
+            });
+            d._children = d.children;
+            d.children = null;
+        } else if (d._children) {
+            // Si el nodo está colapsado, expande todos sus hijos
+            d.children = d._children;
+            d._children = null;
+
+            // Para el tercer nivel, expande completamente solo un hijo (el primero por ejemplo) y colapsa los demás
+            if (d.children) {
+                d.children.forEach(function(child, index){
+                    if (index === 0) { // Expandir completamente solo el primer hijo
+                        expandFully(child);
+                    } else {
+                        collapse(child); // Colapsar los demás hijos
+                    }
+                });
+            }
+        }
+        update(d); // Actualizar el árbol
+    }
+
+    // Función para mostrar un modal al hacer clic en un nodo
+    function showModal(d) {
+        var modal = document.getElementById("myModal");
+        var title = document.getElementById("modalTitle");
+        var text = document.getElementById("modalText");
+        var span = document.getElementsByClassName("close-info-modal")[0];
+
+        title.innerText = d.data.name; // Establece el título del modal
+        text.innerHTML = d.data.description; // Establece el texto del modal
+
+        modal.style.display = "block";
+
+        span.onclick = function() {
+            modal.style.display = "none";
+        }
+
+        window.onclick = function(event) {
+            if (event.target === modal) {
+                modal.style.display = "none";
+            }
+        }
+    }
+
+    // Llamada a la función de inicialización
+    initializeTree();
+
+
+    // Agregar manejador de eventos al botón de reinicio
+    document.getElementById("resetButton").addEventListener("click", function() {
+        initializeTree();  // Reiniciar el árbol a su estado inicial
+    });
+
+});
+</script>
+{% endblock %}

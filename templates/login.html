@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container mt-5 form-signin">
+    <div class="row justify-content-center">
+        <div class="col-lg-4">
+            <!-- Login Form -->
+            <form action="{% url 'login' %}" method="post">
+                {% csrf_token %}
+                <!-- Hidden field for handling the 'next' parameter -->
+                <input type="hidden" name="next" value="{{ request.GET.next|default:'' }}" />
+                <h2 class="text-center mb-4">Log In</h2>
+
+                <!-- Display non-field errors -->
+                {% if form.non_field_errors %}
+                <div class="alert alert-danger" role="alert">
+                    {{ form.non_field_errors|first }}
+                </div>
+                {% endif %}
+
+                <!-- Username input field with floating label -->
+                <div class="mb-3 form-floating">
+                    <input type="text" class="form-control" id="username" name="username" placeholder=" " required="required">
+                    <label for="username">Username</label>
+                    <!-- Display username field errors -->
+                    {% if form.username.errors %}
+                    <div class="text-danger">{{ form.username.errors.as_text }}</div>
+                    {% endif %}
+                </div>
+                <!-- Password input field with floating label -->
+                <div class="mb-3 form-floating">
+                    <input type="password" class="form-control" id="password" name="password" placeholder=" " required="required">
+                    <label for="password">Password</label>
+                    <!-- Display password field errors -->
+                    {% if form.password.errors %}
+                    <div class="text-danger">{{ form.password.errors.as_text }}</div>
+                    {% endif %}
+                </div>
+                <!-- Remember me checkbox -->
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="remember" name="remember">
+                    <label class="form-check-label" for="remember">Remember me</label>
+                </div>
+                <!-- Submit button -->
+                <div class="mb-3">
+                    <button type="submit" class="btn btn-custom w-100">Log in</button>
+                </div>
+                <!-- Link to register page -->
+                <p class="text-center">Don't have an account? <a href="{% url 'register' %}?next={{ request.GET.next|default:'' }}">Register here</a></p>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

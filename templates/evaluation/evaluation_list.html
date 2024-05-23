@@ -1,0 +1,364 @@
+{% extends "base.html" %}
+
+{% block extra_styles %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.22.6/bootstrap-table.min.css">
+<style>
+body {
+    color: #404E67;
+    background: #F5F7FA;
+    font-family: 'Open Sans', sans-serif;
+}
+.table-wrapper {
+    margin: 30px auto 50px;
+    background: #fff;
+    padding: 20px;
+    box-shadow: 0 1px 1px rgba(0,0,0,.05);
+}
+.table-title {
+    padding-bottom: 10px;
+    margin: 0 0 10px;
+}
+.table-title h2 {
+    margin: 6px 0 0;
+    font-size: 22px;
+}
+.table-title .add-new {
+    float: right;
+    height: 30px;
+    font-weight: bold;
+    font-size: 12px;
+    text-shadow: none;
+    min-width: 100px;
+    border-radius: 50px;
+    line-height: 13px;
+    background-color: #fca311;
+    border-color: #fca311;
+}
+.table-title .add-new i {
+    margin-right: 4px;
+}
+
+.table-responsive{
+    padding-bottom: 30px;
+}
+
+table.table tr th, table.table tr td {
+    border-color: #e9e9e9;
+}
+table.table th i {
+    font-size: 13px;
+    margin: 0 5px;
+    cursor: pointer;
+}
+table.table th:last-child {
+    width: 100px;
+}
+table.table td a {
+    cursor: pointer;
+    display: inline-block;
+    margin: 0 5px;
+    min-width: 24px;
+}
+
+table.table td a.edit {
+    color: #FFC107;
+}
+table.table td a.delete {
+    color: #E34724;
+}
+table.table td i {
+    font-size: 19px;
+}
+table.table td a.add i {
+    font-size: 24px;
+    margin-right: -1px;
+    position: relative;
+    top: 3px;
+}
+
+.table td {
+    width: auto;
+    white-space: nowrap;
+    text-align: center;
+}
+
+.table .actions-column a {
+    margin: 0 5px; /* Espacio entre iconos */
+}
+
+/* Estilos Modal Eliminar */
+.modal-confirm {
+  color: #636363;
+  width: 400px;
+}
+.modal-confirm .modal-content {
+  padding: 20px;
+  border-radius: 5px;
+  border: none;
+  text-align: center;
+  font-size: 14px;
+}
+.modal-confirm .modal-header {
+  display: block;
+  text-align: center;
+  border-bottom: none;
+  position: relative;
+}
+.modal-confirm h4 {
+  text-align: center;
+  font-size: 26px;
+  margin: 30px 0 -10px;
+}
+.modal-confirm .close {
+  position: absolute;
+  top: -5px;
+  right: -2px;
+}
+.modal-confirm .modal-body {
+  color: #999;
+}
+.modal-confirm .modal-footer {
+  border: none;
+  text-align: center;
+  border-radius: 5px;
+  font-size: 13px;
+  padding: 10px 15px 25px;
+}
+.modal-confirm .modal-footer a {
+  color: #999;
+}
+.modal-confirm .icon-box {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto;
+  border-radius: 50%;
+  z-index: 9;
+  text-align: center;
+  border: 3px solid #f15e5e;
+  display: block;
+}
+.modal-confirm .icon-box i {
+  color: #f15e5e;
+  font-size: 46px;
+  display: inline-block;
+  margin-top: 13px;
+}
+.modal-confirm .btn {
+  color: #fff;
+  background: #60c7c1;
+  text-decoration: none;
+  transition: all 0.4s;
+  line-height: normal;
+  min-width: 120px;
+  border: none;
+  min-height: 40px;
+  border-radius: 3px;
+  margin: 0 5px;
+  outline: none !important;
+}
+.modal-confirm .btn-info {
+  background: #c1c1c1;
+}
+.modal-confirm .btn-info:hover, .modal-confirm .btn-info:focus {
+  background: #a8a8a8;
+}
+.modal-confirm .btn-danger {
+  background: #f15e5e;
+}
+.modal-confirm .btn-danger:hover, .modal-confirm .btn-danger:focus {
+  background: #ee3535;
+}
+
+.close-delete-modal{
+    margin-left: 90% !important;
+}
+
+.btn-info.add-new {
+    color: white;
+    background-color: #FCA311;
+}
+
+.btn-info.add-new:hover,
+.btn-info.add-new:active,
+.btn-info.add-new:focus-visible {
+    background-color: #f7931e;
+    color: white;
+    border-color: #f7931e;
+}
+
+</style>
+{% endblock %}
+
+
+{% block title %}
+Evaluations List
+{% endblock %}
+
+{% block content %}
+<div class="container-lg">
+    <div class="table-responsive">
+        <div class="table-wrapper">
+            <div class="table-title">
+                {% if user.is_authenticated %}
+                <div class="row">
+                    <div class="col-12">
+                        <button type="button" class="btn btn-info add-new float-end" onclick="window.location='{% url 'create_evaluation' %}'">
+                            <i class="fa fa-plus"></i> New
+                        </button>
+                    </div>
+                </div>
+                {% endif %}
+
+                <div class="row">
+                    <div class="col-12">
+                        <h2 class="display-5 fw-bold">My evaluations</h2><br>
+                        <p class="text-justify model-element-description">Evaluations are structured assessments that analyze the quality of narrative visualizations. Users can create evaluations using predefined or custom Quality Profiles, which guide the assessment based on weighted criteria, properties, and applications. Each evaluation involves responding to a series of questions about the visualization, with each response option assigned a value reflecting its alignment with the quality goals. The final quality score is a weighted sum of these values, offering a nuanced understanding of the visualization's effectiveness.</p>
+                    </div>
+                </div>
+
+            </div>
+            <table
+                class="table table-bordered"
+                data-toggle="table"
+                data-sortable="true"
+{#                data-multiple-sort="true"#}
+                data-pagination="true"
+                data-search="true">
+                <thead>
+                    <tr>
+                        <th data-sortable="true">Date</th>
+                        <th data-sortable="true">Title</th>
+                        <th data-sortable="true">Quality Profile</th>
+                        <th data-sortable="true">Status</th>
+                        <th>File</th>
+                        <th data-sortable="true">MVS</th>
+                        <th data-sortable="true">Score</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for evaluation in evaluations %}
+                    <tr class="align-middle">
+                        <!-- Fecha de la Evaluación -->
+                        <td>{{ evaluation.date|date:"d/m/y" }}</td>
+                        <!-- Título de la Evaluación -->
+                        <td>{{ evaluation.title }}</td>
+                        <!-- Perfil de Calidad -->
+                        <td>{{ evaluation.quality_profile }}</td>
+                         <!-- Estado de la Evaluación -->
+                        <td>{{ evaluation.status }}</td>
+                        <!-- Archivo -->
+                        <td><a href="{{ evaluation.file }}" target="_blank">View link</a></td>
+                        <!-- MVS -->
+                        <td>{{ evaluation.minimum_viable_score }}</td>
+                        <!-- Puntaje -->
+                        <td>{{ evaluation.score|default_if_none:"-" }}</td>
+                        <!-- Acciones -->
+                        <td class="actions-column">
+                            {% if evaluation.status != 'draft' %}
+                                <a href="{% url 'view_evaluation_report' evaluation.id %}" title="View" data-toggle="tooltip" class="ver"><i class="material-icons">&#xE8F4;</i></a>
+                            {% else %}
+                                <span class="disabled-link" title="View (not available in draft)" data-toggle="tooltip"><i class="material-icons">&#xE8F4;</i></span>
+                            {% endif %}
+                            <a href="{% url 'edit_evaluation' evaluation.id 0 %}" title="Edit" data-toggle="tooltip" class="edit"><i class="material-icons">&#xE254;</i></a>
+                            <a href="#" title="Delete" data-toggle="modal" data-tooltip="tooltip" data-target="#deleteModal" data-id="{{ evaluation.id }}" class="delete"><i class="material-icons">&#xE872;</i></a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                        <tr><td colspan="8">No evaluations available.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Confirm Delete Modal -->
+<div id="deleteModal" class="modal fade">
+  <div class="modal-dialog modal-confirm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="btn-close close-delete-modal" data-bs-dismiss="modal" aria-hidden="true"></button>
+        <div class="icon-box">
+          <i class="fa fa-trash"></i>
+        </div>
+        <h4 class="modal-title">Delete Evaluation</h4>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete this evaluation? This process cannot be undone.</p>
+      </div>
+      <div class="modal-footer justify-content-center">
+        <button type="button" class="btn btn-info" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-danger" id="confirmDelete">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.22.6/bootstrap-table.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.22.6/extensions/multiple-sort/bootstrap-table-multiple-sort.min.js"></script>
+
+<script>
+$(document).ready(function(){
+     // Initialize Bootstrap Table
+    $('table').bootstrapTable();
+
+    $.ajaxSetup({
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}'
+        }
+    });
+
+    $('[data-toggle="tooltip"]').tooltip();
+    $('[data-tooltip="tooltip"]').tooltip();
+
+    // Function to show success alert
+    function showSuccessAlert(containerSelector) {
+        var successAlert = '<div class="alert alert-success alert-dismissible fade show" role="alert">' +
+                           'Evaluation successfully removed!' +
+                           '</div>';
+        $(containerSelector).prepend(successAlert);
+    }
+
+    // Function to handle the deletion
+    function handleDeletion(evaluationId) {
+        $('#confirmDelete').prop('disabled', true).text('Deleting...');
+        $.ajax({
+            url: `/evaluation/${evaluationId}/delete/`,
+            type: 'POST',
+            success: function(response) {
+                $('#deleteModal').modal('hide');
+                // Show success alert
+                showSuccessAlert('.container-lg');
+                // Wait for 2 seconds before reloading to allow the alert to be seen
+                setTimeout(function() { location.reload(); }, 2000);
+            },
+            error: function(response) {
+                $('#confirmDelete').prop('disabled', false).text('Delete');
+                console.error('Error deleting evaluation.');
+                alert('There was an error deleting the evaluation.'); // Replace with a more user-friendly error message
+            }
+        });
+    }
+
+    // Delegate the show modal event to the dynamic .delete button using the table as the parent
+    $('.table').on('click', '.delete', function (event) {
+        var button = $(this); // The delete button that was clicked
+        var evaluationId = button.data('id');
+        var modal = $('#deleteModal');
+
+        modal.find('#confirmDelete').off('click').on('click', function() {
+            handleDeletion(evaluationId);
+        });
+
+        // Trigger the modal to open
+        modal.modal('show');
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,109 @@
+html{
+    scroll-behavior: smooth;
+}
+
+body {
+        font-family: 'Proxima Nova', sans-serif;
+        background-color: #FFFFFF;
+        color: #000000;
+        /*padding-bottom: 200px;*/ /* for footer in static position */
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh; /* 100% of the viewport height */
+        margin: 0;
+    }
+
+    .content-wrap {
+        flex: 1; /* Ensures that this container takes up the available space */
+    }
+
+    .footer {
+        background-color: #14213d; /* color azul */
+        color: #FFFFFF; /* blanco */
+        padding: 50px 0;
+        position: relative;
+        width: 100%;
+        text-align: center;
+        font-size: 1.5rem;
+        /*bottom: 0;*/
+        /*z-index: 9999;*/
+    }
+
+    .login-container {
+    background-color: #FFFFFF;
+    padding: 30px;
+    max-width: 400px;
+    margin: 10% auto;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    }
+
+    .login-button {
+        background-color: #14213d; /* Azul */
+        color: #FFFFFF; /* Blanco */
+        border: none;
+        padding: 10px 20px;
+        cursor: pointer;
+        border-radius: 4px;
+    }
+
+    .login-form {
+        width: 340px;
+        margin: 50px auto;
+        font-size: 15px;
+    }
+    .login-form form {
+        margin-bottom: 15px;
+        background: #f7f7f7;
+        box-shadow: 0 2px 2px rgba(0, 0, 0, 0.3);
+        padding: 30px;
+    }
+    .login-form h2 {
+        margin: 0 0 15px;
+    }
+    .form-control, .btn {
+        min-height: 38px;
+        border-radius: 2px;
+    }
+    .btn {
+        font-size: 15px;
+        font-weight: bold;
+    }
+
+    a {
+        text-decoration: none;
+        color: #14213d; /* Azul */
+    }
+
+    .table-nowrap .table td,
+    .table-nowrap .table th {
+        white-space: nowrap;
+    }
+
+    .table>:not(caption)>*>* {
+        padding: 0.75rem 1.25rem;
+        border-bottom-width: 1px;
+    }
+
+    table th {
+        font-weight: 600;
+        background-color: #FFFFFF !important;
+    }
+
+  .btn-custom {
+    background-color: #FCA311;
+    color: white;
+    display: inline-block;
+    min-width: 120px;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    white-space: nowrap; /* Prevents text from wrapping */
+    overflow: hidden; /* Ensures overflow text is hidden */
+    text-overflow: ellipsis; /* Adds an ellipsis to overflow text */
+    border-radius: 3px;
+}
+
+  .btn-custom:hover {
+    background-color: #f7931e; /* Slightly darker for hover effect */
+    color: white;
+}

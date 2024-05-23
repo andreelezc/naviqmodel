@@ -1,0 +1,423 @@
+{% extends 'base.html' %}
+
+{% block extra_styles %}
+<style>
+    .container {
+        padding-left: 30px;   /* Reduced padding for a more narrow look */
+        padding-right: 30px;  /* Reduced padding for a more narrow look */
+        max-width: 700px !important;    /* Reduced the max-width for a less wide look */
+        margin: 80px auto 50px; /* Auto will center the container on the screen */
+        font-family: Proxima Nova, sans-serif;
+        position: relative;
+    }
+
+    .title-input {
+        border: none;
+        outline: none;
+        font-size: 16px;
+        font-weight: bold;
+        background: transparent url('https://img.icons8.com/ios-glyphs/30/000000/pencil.png') no-repeat left center;
+        background-size: 20px;
+        padding-left: 25px !important;
+        cursor: pointer;
+        border-bottom: 1px solid #000;
+    }
+
+    label[for="evaluationTitle"] {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        margin: -1px;
+        padding: 0;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        border: 0;
+    }
+
+    .no-padding-left {
+        padding-left: 0;
+    }
+
+    .graph {
+        width: 100%;
+        padding-top: 30px;
+        text-align: center; /* centra la imagen horizontalmente */
+    }
+
+    .graph img {
+        max-width: 100%;
+        height: auto;
+    }
+
+    .question {
+        margin-bottom: 20px;
+    }
+
+    .help-toggle {
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .lightbulb {
+        background-color: #f2f2f2;
+        border-radius: 50%;
+        padding: 8px;
+        margin-right: 5px;
+    }
+
+    .toggle-label {
+        color: #777;
+    }
+
+    .help-section {
+        background-color: #f2f2f2;
+        padding: 10px;
+        opacity: 0;
+        max-height: 0;
+        overflow: hidden;
+        transition: opacity 0.3s, max-height 0.3s;
+    }
+
+    .help-section.active {
+        opacity: 1;
+        max-height: 100%;
+    }
+
+    .help-image {
+        display: flex;
+        justify-content: center; /* Centered the image */
+        margin-bottom: 10px;
+        max-width: 100%;
+        height: auto;
+    }
+
+    .options {
+        list-style-type: none;
+        padding: 0;
+    }
+
+    .options li {
+        margin-bottom: 10px;
+    }
+
+    .button-container{
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        max-width: 640px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .row.mt-4 {
+        justify-content: space-between;
+        width: 100%; /* Asegúrate de que la fila tome todo el ancho disponible */
+    }
+
+    .col-6 {
+        padding: 0; /* Elimina rellenos adicionales */
+        margin: 0; /* Elimina márgenes adicionales */
+        display: flex; /* Usa flexbox en los contenedores de los botones */
+    }
+
+    .nav-label a {
+        text-decoration: none;
+        color: inherit;
+        display: block;
+    }
+
+    .nav-label {
+        cursor: pointer;
+        color: #777;
+        background: transparent;
+        border: none;
+        font-size: 16px;
+        font-weight: normal;
+        height: 40px;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        text-align: left; /* Alineación por defecto */
+        flex: 1; /* Ocupa todo el espacio disponible dentro de .col-6 */
+
+    }
+
+    .arrow {
+        color: #fca311;
+        font-size: 18px;
+    }
+
+    .nav-label:focus {
+        outline: none;
+        box-shadow: none;
+    }
+
+    .next-label {
+        text-align: right; /* Alinea el botón 'Next' a la derecha */
+    }
+
+    .prev-label {
+        margin-left: 30px;
+    }
+
+
+    .progress-wrapper {
+        width: 100%;
+        padding: 10px 0;
+        margin: 20px 0; /* This will add space above and below the progress bar */
+    }
+
+    .progress-container {
+        width: 100%;
+        height: 20px;
+        background-color: #E0E0E0;
+        border-radius: 5px;
+    }
+
+    .progress-bar {
+        background-color: #FCA311 !important;
+        height: 100%;
+        border-radius: 5px;
+
+
+    }
+
+    .bordered-section {
+    border: 1px solid #dee2e6; /* Bootstrap's light grey border color */
+    border-radius: 0.30rem; /* Slightly rounded corners */
+    padding: 1rem; /* Add some padding inside the sections */
+    margin-bottom: 1rem; /* Add some margin to the bottom of sections */
+    }
+
+    #evaluation-file {
+    max-width: 70%;  /* Maximum width of the image */
+    max-height: 500px; /* Maximum height of the image */
+    width: auto;       /* Width adjusts to maintain aspect ratio */
+    height: auto;      /* Height adjusts to maintain aspect ratio */
+    object-fit: contain;
+    display: block;    /* Display as block */
+    margin: 0 auto;    /* Auto margin for horizontal centering */
+}
+
+    #help-img {
+    max-width: 100%;  /* Maximum width of the image */
+    max-height: 600px; /* Maximum height of the image */
+    width: auto;       /* Width adjusts to maintain aspect ratio */
+    height: auto;      /* Height adjusts to maintain aspect ratio */
+    object-fit: contain;
+    display: block;    /* Display as block */
+    margin: 0 auto;    /* Auto margin for horizontal centering */
+}
+
+</style>
+{% endblock %}
+
+{% block content %}
+
+{% if messages %}
+<div class="messages">
+    {% for message in messages %}
+    <div class="{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% load mathfilters %}
+{% with current_question_number=current_question_index|add:"1" %}
+<div class="container mt-4">
+<!-- Title input -->
+<div class="row">
+    <div class="col-4 no-padding-left">
+        <label for="evaluationTitle">Title:</label>
+        <input id="evaluationTitle" class="title-input form-control title-input" type="text" value="{{ evaluation.title }}">
+    </div>
+</div>
+
+<!-- Graph section -->
+    <div class="row mt-4">
+        <div class="col-12 graph bordered-section">
+            <img src="{{ evaluation.file }}" alt="Visualización del gráfico" id="evaluation-file">
+        </div>
+    </div>
+
+<!-- Survey question section -->
+<div class="row mt-4">
+    <div class="col-12 question">
+        <h2>{{ application.name }}</h2>
+        <p class="lead">{{ application.description | safe }}</p>
+
+         <!-- Help Toggle section -->
+        <div id="toggleHelp" class="help-toggle">
+            <span class="lightbulb">&#x1F4A1;</span>
+            <span class="toggle-label">Hide help</span>
+        </div>
+
+        <!-- Help section -->
+        <div class="help-section mt-3 active" id="helpContent">
+            <!-- Mostrar el contenido de ayuda -->
+            <p>{{ application.help_text | safe }}</p>
+            {% if application.help_image %}
+            <div class="help-image mt-2">
+                <!-- Mostrar la imagen de ayuda -->
+                <img src="{{ application.help_image.url }}" alt="Help image" id="help-img">
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{#<!-- Options section según tipo de aplicación LATEST --> #}
+<form method="post" class="row mt-4 needs-validation" novalidate>
+{% csrf_token %}
+<div class="col-12">
+    <ul class="list-unstyled options">
+        {% for field in form %}
+        <li class="mb-2 form-check">
+            <label class="form-check-label">
+                {{ field }}
+            </label>
+        </li>
+        {% endfor %}
+    </ul>
+    <div class="invalid-feedback"></div>
+
+    <!-- Hidden input for edit mode -->
+    {% if is_edit %}
+        <input type="hidden" name="is_edit" value="true">
+    {% endif %}
+
+
+<!-- Navigation buttons -->
+<div class="button-container">
+    <div class="row mt-4">
+        <div class="col-6">
+            {% if current_question_index > 0 %}
+                <a href="{% url 'question_and_options' evaluation_id=evaluation.id current_question_index=current_question_index|add:"-1" %}" class="nav-label prev-label w-100"><span class="arrow">&#x2190;</span> Previous </a>
+            {% endif %}
+        </div>
+        <div class="col-6">
+            {% if is_last_question %}
+                <button type="submit" formaction="{% url 'finalize_evaluation' evaluation.id %}" class="nav-label next-label w-100">Finish</button>
+            {% else %}
+                <button type="submit" class="nav-label next-label w-100">Next <span class="arrow">&#x2192;</span></button>
+            {% endif %}
+        </div>
+    </div>
+</div>
+</div>
+
+</form>
+
+<!-- Progress bar -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="progress-wrapper">
+            <div class="progress-container">
+                <div class="progress-bar" role="progressbar" style="width: {{ current_question_number|div:total_questions|mul:100|floatformat:0 }}%;" aria-valuenow="{{ current_question_number|div:total_questions|mul:100|floatformat:2 }}" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+            <!-- Muted text description -->
+            <p class="text-muted" style="text-align: center; margin-top: 5px;">
+                Evaluation Progress: {{ current_question_number }} of {{ total_questions }}
+            </p>
+        </div>
+    </div>
+</div>
+
+</div>
+{% endwith %}
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // Toggle the help section
+    document.getElementById("toggleHelp").addEventListener("click", function() {
+        const helpContent = document.getElementById("helpContent");
+        const toggleLabel = document.querySelector(".toggle-label");
+        if (helpContent.classList.contains("active")) {
+            helpContent.classList.remove("active");
+            toggleLabel.textContent = "Show help";
+        } else {
+            helpContent.classList.add("active");
+            toggleLabel.textContent = "Hide help";
+        }
+    });
+
+    // Función que se llama cuando se edita el título
+    function updateTitle(evaluationId) {
+        var newTitle = document.getElementById("evaluationTitle").value;
+
+        fetch("{% url 'update_evaluation_title' 0 %}".replace('0', evaluationId), {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'title=' + encodeURIComponent(newTitle)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (!data.success) {
+                alert("Error al actualizar el título.");
+            }
+        });
+    }
+
+    // Event listener para el campo de título
+    document.getElementById("evaluationTitle").addEventListener("blur", function() {
+        updateTitle({{ evaluation.id }});
+    });
+
+    // Prevent submission if there are no options selected
+     document.querySelector('form.needs-validation').addEventListener('submit', function(event) {
+        var responseType = '{{ application.response_type }}';
+        var form = this;
+        var isValid = true;
+        var feedback = form.querySelector('.invalid-feedback');
+
+        // Check for multiple choice validation
+        if (responseType === 'multiple') {
+            var checkboxes = form.querySelectorAll('input[type="checkbox"]');
+            var checkedOne = Array.from(checkboxes).some(checkbox => checkbox.checked);
+            if (!checkedOne) {
+                isValid = false;
+                // Show the feedback message if no checkboxes are checked.
+                if (feedback) {
+                    feedback.textContent = "Please, select at least one option.";
+                    feedback.style.display = 'block';
+                }
+            }
+        }
+
+        // Check for single choice validation (radio buttons)
+        if (responseType === 'single') {
+            var radios = form.querySelectorAll('input[type="radio"]');
+            var selectedOne = Array.from(radios).some(radio => radio.checked);
+            if (!selectedOne) {
+                isValid = false;
+                // Show the feedback message if no radio button is selected.
+                if (feedback) {
+                    feedback.textContent = "Please, select an option.";
+                    feedback.style.display = 'block';
+                }
+            }
+        }
+
+        // If the form is not valid, prevent submission
+        if (!isValid) {
+            event.preventDefault();
+            event.stopPropagation();
+        } else {
+            // If there is at least one checkbox checked or one radio selected, hide the feedback message.
+            if (feedback) {
+                feedback.style.display = 'none';
+            }
+        }
+
+        form.classList.add('was-validated');
+    });
+
+
+
+</script>
+{% endblock %}
