@@ -6,7 +6,7 @@ import plotly.utils
 from .models import Application, ProfileCriterionPropertyApplication, ProfileCriterionProperty, \
     QualityProfileCriterion
 
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 
 
 class ReportService:
@@ -247,6 +247,10 @@ class ReportService:
                         profile_criterion_property=profile_criterion_property):
                     application = profile_criterion_property_application.application
                     current_score = self.get_application_score(application)
+
+                    if current_score is None:
+                        continue  # Skip N/A scores
+
                     max_contribution = self.calculate_contribution_for_application(application, profile_criterion,
                                                                                    profile_criterion_property,
                                                                                    profile_criterion_property_application)
@@ -254,11 +258,21 @@ class ReportService:
         return deltas
 
     def get_application_score(self, application):
+        """
+        Retrieve the current score for an application from precomputed detailed_scores.
+        """
         detailed_criteria = self.evaluation.detailed_scores.get('criteria', {})
         for criterion_name, criterion_details in detailed_criteria.items():
             for property_name, property_details in criterion_details['details'].items():
                 if application.name in property_details['details']:
                     app_details = property_details['details'][application.name]
-                    print(f"Retrieved score for {application.name}: {app_details['score']}")
-                    return Decimal(app_details['score'])
-        return Decimal('0.0')
+                    score_str = app_details['score']
+                    if score_str == "N/A":
+                        return None  # Return None to indicate non-applicable
+                    try:
+                        return Decimal(score_str)
+                    except (ValueError, InvalidOperation) as e:
+                        print(f"Error converting score to Decimal for {application.name}: {score_str} - {e}")
+                        raise
+
+        return Decimal('0.0'    )

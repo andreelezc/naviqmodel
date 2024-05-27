@@ -117,7 +117,7 @@ class Property(EvaluativeEntity):
                     app_score = app.calculate_score(selected_options)
 
                     if app_score is not None:
-                        weighted_app_score = app_score * weights[app.id]  # usaba weighted app para mostrar en
+                        # weighted_app_score = app_score * weights[app.id]  # usaba weighted app para mostrar en
                         # reporte pero en realidad se debe mostrar el valor crudo
                         if app not in applications_with_na:
                             total_score += app_score * weights[app.id]
