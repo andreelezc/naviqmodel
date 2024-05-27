@@ -36,7 +36,9 @@ class ReportService:
                     detailed_applications[application_name] = application_info
 
         # Sort criteria by score in descending order
-        sorted_criteria_data = {k: v for k, v in sorted(detailed_criteria_data.items(), key=lambda item: Decimal(item[1]['score']), reverse=True)}
+        sorted_criteria_data = {k: v for k, v in
+                                sorted(detailed_criteria_data.items(), key=lambda item: Decimal(item[1]['score']),
+                                       reverse=True)}
 
         # Generate visualizations for criteria and properties
         criteria_chart_json = self._create_criteria_scores_chart(sorted_criteria_data)
@@ -252,9 +254,11 @@ class ReportService:
         return deltas
 
     def get_application_score(self, application):
-        """
-        Retrieve the current score for an application from precomputed detailed_scores.
-        """
-        detailed_applications = self.evaluation.detailed_scores.get('applications', {})
-        application_score = detailed_applications.get(application.name, {}).get('score', 0)
-        return Decimal(application_score)
+        detailed_criteria = self.evaluation.detailed_scores.get('criteria', {})
+        for criterion_name, criterion_details in detailed_criteria.items():
+            for property_name, property_details in criterion_details['details'].items():
+                if application.name in property_details['details']:
+                    app_details = property_details['details'][application.name]
+                    print(f"Retrieved score for {application.name}: {app_details['score']}")
+                    return Decimal(app_details['score'])
+        return Decimal('0.0')

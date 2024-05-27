@@ -117,12 +117,13 @@ class Property(EvaluativeEntity):
                     app_score = app.calculate_score(selected_options)
 
                     if app_score is not None:
-                        weighted_app_score = app_score * weights[app.id]
+                        weighted_app_score = app_score * weights[app.id]  # usaba weighted app para mostrar en
+                        # reporte pero en realidad se debe mostrar el valor crudo
                         if app not in applications_with_na:
                             total_score += app_score * weights[app.id]
 
                         detailed_applications[app.name] = {
-                            'score': str(weighted_app_score),
+                            'score': str(app_score),  # aca iria weighted app si se decidiera mostrar el valor agregado
                             'weight': str(weights[app.id]),
                             'description': app.description,
                             'user_response': ', '.join([option.description for option in selected_options])
@@ -318,7 +319,8 @@ class UserResponse(models.Model):
     selected_options = models.ManyToManyField(AnswerOption, related_name="responses")
 
     def __str__(self):
-        selected_descriptions = [f"{option.description} (Value: {option.value})" for option in self.selected_options.all()]
+        selected_descriptions = [f"{option.description} (Value: {option.value})" for option in
+                                 self.selected_options.all()]
         descriptions_str = ", ".join(selected_descriptions)
         return f"{self.application.name}: {descriptions_str}"
 
