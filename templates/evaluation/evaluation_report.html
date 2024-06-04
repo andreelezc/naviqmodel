@@ -441,6 +441,7 @@ i.fa.fa-print{
                                                                     </h2>
                                                                     <div id="collapseApplications{{ forloop.parentloop.counter }}{{ forloop.counter }}" class="accordion-collapse collapse" aria-labelledby="headingApplications{{ forloop.parentloop.counter }}{{ forloop.counter }}" data-bs-parent="#accordionApplications{{ forloop.counter }}">
                                                                         <div class="accordion-body">
+                                                                        {% if property_info.details %}
                                                                             <table class="table results-table">
                                                                                 <thead>
                                                                                     <tr>
@@ -477,14 +478,20 @@ i.fa.fa-print{
                                                                                             </td>
                                                                                             <td>
                                                                                                 {% with delta=report_data.applications_deltas|get_item:application_name %}
-                                                                                                    {{ delta|floatformat:2 }}
+                                                                                                    {% if delta is not None %}
+                                                                                                        {{ delta|floatformat:2 }}
+                                                                                                    {% else %}
+                                                                                                        -
+                                                                                                    {% endif %}
                                                                                                 {% endwith %}
                                                                                             </td>
-
                                                                                         </tr>
                                                                                     {% endfor %}
                                                                                 </tbody>
                                                                             </table>
+                                                                        {% else %}
+                                                                            <p>No applications to display.</p>
+                                                                        {% endif %}
                                                                         </div>
                                                                     </div>
                                                                 </div>

@@ -98,6 +98,11 @@ class Property(EvaluativeEntity):
             )
             applications_with_na = [response.application for response in na_responses]
 
+            # Check if all applications are non-applicable
+            if applications.count() == len(applications_with_na):
+                # Skip this property as it does not apply
+                continue
+
             # Calculate weights: Only redistribute weights if applications are excluded because of "N/A"
             if applications.count() != applications.exclude(id__in=[app.id for app in applications_with_na]).count():
                 weight_per_app = Decimal(1) / Decimal(
