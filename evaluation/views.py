@@ -27,7 +27,7 @@ def home_view(request):
     }
 
     # Retrieve the "standard" quality profile (case-insensitive)
-    quality_profile_name = "standard"
+    quality_profile_name = "standard validated"
     quality_profile = QualityProfile.objects.filter(name__iexact=quality_profile_name).first()
 
     if quality_profile:
