@@ -26,7 +26,7 @@ SECRET_KEY = "django-insecure-6gb!la)p4yz2pb&$=b&cdhm6!k+77btqri&9ddlhm3*b(w%hkk
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', 'naviqmodel.pythonanywhere.com']
+ALLOWED_HOSTS = ['127.0.0.1', 'naviqmodel.pythonanywhere.com', 'naviqv2.pythonanywhere.com']
 
 
 # Application definition
